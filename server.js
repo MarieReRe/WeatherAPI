@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.get('/', (request, response) => {
-  response.send('Home Page!');
+  response.send('City Explorer Goes Here');
 });
 // Make sure the server is listening for requests
 app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
