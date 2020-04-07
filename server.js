@@ -44,7 +44,7 @@ function weatherHandler(request, response) {
   const weatherData = require('./data/darksky.json');
   const weatherResults = [];
   weatherData.daily.data.forEach(dailyWeather => {
-    weather().push(new weatherResults(dailyWeather));
+    weatherResults.push(new Weather(dailyWeather));
   });
   response.send(weatherResults);
 }
