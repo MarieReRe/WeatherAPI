@@ -9,7 +9,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Application Setup
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 const app = express();
 
 app.use(cors()); // Middleware
@@ -44,7 +44,7 @@ function weatherHandler(request, response) {
   const weatherData = require('./data/darksky.json');
   const weatherResults = [];
   weatherData.daily.data.forEach(dailyWeather => {
-    weatherResults.push(new weatherResults(dailyWeather));
+    weather().push(new weatherResults(dailyWeather));
   });
   response.send(weatherResults);
 }
