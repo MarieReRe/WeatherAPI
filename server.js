@@ -9,7 +9,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Application Setup
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001              ;
 const app = express();
 
 app.use(cors()); // Middleware
@@ -29,11 +29,21 @@ app.get('/weather', (request, response) => {
 // Add /location route
 app.get('/location', locationHandler);
 
-// Route Handler
+// Add /location route
+app.get('/weather', weatherHandler);
+
+// Route Handler: location
 function locationHandler(request, response) {
   const geoData = require('./data/geo.json');
   const city = request.query.city;
   const location = new Location(city, geoData);
+  response.send(location);
+}
+// Route Handler: weather
+function locationHandler(request, response) {
+  const weatherData = require('./data/darksky.json');
+  const city = request.query.city;
+  const location = new Location(city, weatherData);
   response.send(location);
 }
 
