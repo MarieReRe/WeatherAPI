@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/mrsantons/WeatherAPI#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0"
   }
 }
