@@ -22,9 +22,7 @@ app.get('/bad', (request, response) => {
   throw new Error('oops');
 });
 
-app.get('/weather', (request, response) => {
-  response.send('Weather.');
-});
+
 
 // Add /location route
 app.get('/location', locationHandler);
@@ -42,9 +40,11 @@ function locationHandler(request, response) {
 // Route Handler: weather
 function locationHandler(request, response) {
   const weatherData = require('./data/darksky.json');
-  const city = request.query.city;
-  const location = new Location(city, weatherData);
-  response.send(location);
+  const weatherResults = [];
+  weatherData.daily.data.forEach(dailyWeather => {
+    weatherResults.push(new weatherResults(dailyWeather))
+  });
+  response.send(weatherResults);
 }
 
 // Has to happen after everything else
@@ -76,4 +76,10 @@ function Location(city, geoData) {
   this.formatted_query = geoData[0].display_name; // "Cedar Rapids, Iowa"
   this.latitude = parseFloat(geoData[0].lat);
   this.longitude = parseFloat(geoData[0].lon);
+}
+
+// Weather
+function Weather(weatherData) {
+  this.forcast = weatherData.summary;
+  this.time = new Date(weatherData.time * 1000);
 }
