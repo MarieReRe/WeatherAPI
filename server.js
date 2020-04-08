@@ -32,57 +32,69 @@ app.get('/location', locationHandler);
 
 // Route Handler: location
 function locationHandler(request, response) {
-  const geoData = require('./data/geo.json');
-  const city = request.query.city;
-  const location = new Location(city, geoData);
-  response.send(location);
-}
+  // const geoData = require('./data/geo.json');
+  const url = 'https://us1.locationiq.com/v1/search.php';
+  superagent.get(url)
+    .query({
+      key: process.env.GEO_KEY,
+      q: city, // query
+      format: 'json'
+    })
+    .then(locationResponse => {
+      let geoData = locationResponse.body;
+      const location = new Location(city, geoData);
+      response.send(location);
+    })
+    .catch(err => {
+      console.log(err);
+      errorHandler(err, request, response);
+    });
 
 // Add /weather route
 app.get('/weather', weatherHandler);
-// Route Handler: weather
-function weatherHandler(request, response) {
-  const weatherData = require('./data/darksky.json');
-  const weatherResults = [];
-  weatherData.daily.data.forEach(dailyWeather => {
-    weatherResults.push(new Weather(dailyWeather));
-  });
-  response.send(weatherResults);
-}
+  // Route Handler: weather
+  function weatherHandler(request, response) {
+    const weatherData = require('./data/darksky.json');
+    const weatherResults = [];
+    weatherData.daily.data.forEach(dailyWeather => {
+      weatherResults.push(new Weather(dailyWeather));
+    });
+    response.send(weatherResults);
+  }
 
-// Has to happen after everything else
-app.use(notFoundHandler);
-// Has to happen after the error might have occurred
-app.use(errorHandler); // Error Middleware
+  // Has to happen after everything else
+  app.use(notFoundHandler);
+  // Has to happen after the error might have occurred
+  app.use(errorHandler); // Error Middleware
 
-// Make sure the server is listening for requests
-app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
+  // Make sure the server is listening for requests
+  app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
 
-// Helper Functions
+  // Helper Functions
 
-function errorHandler(error, request, response, next) {
-  console.log(error);
-  response.status(500).json({
-    error: true,
-    message: error.message,
-  });
-}
+  function errorHandler(error, request, response, next) {
+    console.log(error);
+    response.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
 
-function notFoundHandler(request, response) {
-  response.status(404).json({
-    notFound: true,
-  });
-}
+  function notFoundHandler(request, response) {
+    response.status(404).json({
+      notFound: true,
+    });
+  }
 
-function Location(city, geoData) {
-  this.search_query = city; // "cedar rapids"
-  this.formatted_query = geoData[0].display_name; // "Cedar Rapids, Iowa"
-  this.latitude = parseFloat(geoData[0].lat);
-  this.longitude = parseFloat(geoData[0].lon);
-}
+  function Location(city, geoData) {
+    this.search_query = city; // "cedar rapids"
+    this.formatted_query = geoData[0].display_name; // "Cedar Rapids, Iowa"
+    this.latitude = parseFloat(geoData[0].lat);
+    this.longitude = parseFloat(geoData[0].lon);
+  }
 
-// Weather
-function Weather(weatherData) {
-  this.forcast = weatherData.summary;
-  this.time = new Date(weatherData.time * 1000);
-}
+  // Weather
+  function Weather(weatherData) {
+    this.forcast = weatherData.summary;
+    this.time = new Date(weatherData.time * 1000);
+  }
