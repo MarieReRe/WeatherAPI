@@ -54,13 +54,29 @@ function locationHandler(request, response) {
 app.get('/weather', weatherHandler);
   // Route Handler: weather
   function weatherHandler(request, response) {
-    const weatherData = require('./data/darksky.json');
-    const weatherResults = [];
-    weatherData.daily.data.forEach(dailyWeather => {
-      weatherResults.push(new Weather(dailyWeather));
+
+    const weather.request.query.search_query;
+    const url = 'https://api.weatherbit.io/v2.0/forecast/daily'
+    superagent.get(url)
+    .query ({
+      key: process.env.WEATHER_KEY,
+      city: 
+      format: 'json'
+    })
+    .then(weatherresponse => {
+      
+      let weatherData = weatherresponse.body;
+      let dailyWeatherResult = weather.data.map(dailyWeatherResult =>{
+        // return new weather(daily)
+      })
+      const weather = new weather(city, weatherData);
+      response.send(weather);
+    })
+    .catch(err => {
+      console.log(err);
+      errorHandler(err, request, response);
     });
-    response.send(weatherResults);
-  }
+  
 
   // Has to happen after everything else
   app.use(notFoundHandler);
@@ -87,8 +103,8 @@ app.get('/weather', weatherHandler);
   }
 
   function Location(city, geoData) {
-    this.search_query = city; // "cedar rapids"
-    this.formatted_query = geoData[0].display_name; // "Cedar Rapids, Iowa"
+    this.search_query = city; 
+    this.formatted_query = geoData[0].display_name;
     this.latitude = parseFloat(geoData[0].lat);
     this.longitude = parseFloat(geoData[0].lon);
   }
@@ -96,5 +112,5 @@ app.get('/weather', weatherHandler);
   // Weather
   function Weather(weatherData) {
     this.forcast = weatherData.summary;
-    this.time = new Date(weatherData.time * 1000);
+    this.time = new Date(weatherData.ts);
   }
