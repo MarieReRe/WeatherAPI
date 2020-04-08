@@ -32,57 +32,85 @@ app.get('/location', locationHandler);
 
 // Route Handler: location
 function locationHandler(request, response) {
-  const geoData = require('./data/geo.json');
-  const city = request.query.city;
-  const location = new Location(city, geoData);
-  response.send(location);
-}
+  // const geoData = require('./data/geo.json');
+  const url = 'https://us1.locationiq.com/v1/search.php';
+  superagent.get(url)
+    .query({
+      key: process.env.GEO_KEY,
+      q: city, // query
+      format: 'json'
+    })
+    .then(locationResponse => {
+      let geoData = locationResponse.body;
+      const location = new Location(city, geoData);
+      response.send(location);
+    })
+    .catch(err => {
+      console.log(err);
+      errorHandler(err, request, response);
+    });
 
 // Add /weather route
 app.get('/weather', weatherHandler);
-// Route Handler: weather
-function weatherHandler(request, response) {
-  const weatherData = require('./data/darksky.json');
-  const weatherResults = [];
-  weatherData.daily.data.forEach(dailyWeather => {
-    weatherResults.push(new Weather(dailyWeather));
-  });
-  response.send(weatherResults);
-}
+  // Route Handler: weather
+  function weatherHandler(request, response) {
 
-// Has to happen after everything else
-app.use(notFoundHandler);
-// Has to happen after the error might have occurred
-app.use(errorHandler); // Error Middleware
+    const weather.request.query.search_query;
+    const url = 'https://api.weatherbit.io/v2.0/forecast/daily'
+    superagent.get(url)
+    .query ({
+      key: process.env.WEATHER_KEY,
+      city: 
+      format: 'json'
+    })
+    .then(weatherresponse => {
+      
+      let weatherData = weatherresponse.body;
+      let dailyWeatherResult = weather.data.map(dailyWeatherResult =>{
+        // return new weather(daily)
+      })
+      const weather = new weather(city, weatherData);
+      response.send(weather);
+    })
+    .catch(err => {
+      console.log(err);
+      errorHandler(err, request, response);
+    });
+  
 
-// Make sure the server is listening for requests
-app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
+  // Has to happen after everything else
+  app.use(notFoundHandler);
+  // Has to happen after the error might have occurred
+  app.use(errorHandler); // Error Middleware
 
-// Helper Functions
+  // Make sure the server is listening for requests
+  app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
 
-function errorHandler(error, request, response, next) {
-  console.log(error);
-  response.status(500).json({
-    error: true,
-    message: error.message,
-  });
-}
+  // Helper Functions
 
-function notFoundHandler(request, response) {
-  response.status(404).json({
-    notFound: true,
-  });
-}
+  function errorHandler(error, request, response, next) {
+    console.log(error);
+    response.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
 
-function Location(city, geoData) {
-  this.search_query = city; // "cedar rapids"
-  this.formatted_query = geoData[0].display_name; // "Cedar Rapids, Iowa"
-  this.latitude = parseFloat(geoData[0].lat);
-  this.longitude = parseFloat(geoData[0].lon);
-}
+  function notFoundHandler(request, response) {
+    response.status(404).json({
+      notFound: true,
+    });
+  }
 
-// Weather
-function Weather(weatherData) {
-  this.forcast = weatherData.summary;
-  this.time = new Date(weatherData.time * 1000);
-}
+  function Location(city, geoData) {
+    this.search_query = city; 
+    this.formatted_query = geoData[0].display_name;
+    this.latitude = parseFloat(geoData[0].lat);
+    this.longitude = parseFloat(geoData[0].lon);
+  }
+
+  // Weather
+  function Weather(weatherData) {
+    this.forcast = weatherData.summary;
+    this.time = new Date(weatherData.ts);
+  }
