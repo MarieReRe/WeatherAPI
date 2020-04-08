@@ -10,7 +10,7 @@ const cors = require('cors');
 const superagent = require('superagent');
 
 // Application Setup
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors()); // Middleware
@@ -32,7 +32,7 @@ app.get('/location', locationHandler);
 
 // Route Handler: location
 function locationHandler(request, response) {
-  // const geoData = require('./data/geo.json');
+  const city = request.query.city; 
   const url = 'https://us1.locationiq.com/v1/search.php';
   superagent.get(url)
     .query({
@@ -40,6 +40,7 @@ function locationHandler(request, response) {
       q: city, // query
       format: 'json'
     })
+  
     .then(locationResponse => {
       let geoData = locationResponse.body;
       const location = new Location(city, geoData);
@@ -49,33 +50,33 @@ function locationHandler(request, response) {
       console.log(err);
       errorHandler(err, request, response);
     });
+  }
 
 // Add /weather route
 app.get('/weather', weatherHandler);
   // Route Handler: weather
   function weatherHandler(request, response) {
-
-    const weather.request.query.search_query;
     const url = 'https://api.weatherbit.io/v2.0/forecast/daily'
     superagent.get(url)
     .query ({
       key: process.env.WEATHER_KEY,
-      city: 
+      lat: request.query.latitude,
+      lon:request.query.longitude, 
       format: 'json'
     })
     .then(weatherresponse => {
-      
       let weatherData = weatherresponse.body;
-      let dailyWeatherResult = weather.data.map(dailyWeatherResult =>{
-        // return new weather(daily)
+      let dailyWeatherResult = weatherData.data.map(weatherResult =>{
+        return new Weather(weatherResult); 
       })
-      const weather = new weather(city, weatherData);
-      response.send(weather);
+    
+      response.send(dailyWeatherResult);
     })
     .catch(err => {
       console.log(err);
       errorHandler(err, request, response);
     });
+  }
   
 
   // Has to happen after everything else
@@ -111,6 +112,6 @@ app.get('/weather', weatherHandler);
 
   // Weather
   function Weather(weatherData) {
-    this.forcast = weatherData.summary;
+    this.forecast = weatherData.weather.description;
     this.time = new Date(weatherData.ts);
   }
