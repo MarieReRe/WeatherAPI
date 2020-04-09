@@ -8,11 +8,22 @@ dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+
 const pg = require('pg');
+
+if (!process.env.DATABASE_URL) {
+  throw 'Missing DATABASE_URL';
+}
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', error => { throw error; });
+
 
 // Application Setup
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+
+
 
 app.use(cors()); // Middleware
 
@@ -128,7 +139,7 @@ function notFoundHandler(request, response) {
     notFound: true,
   });
 }
-
+// Location constructor 
 function Location(city, geoData) {
   this.search_query = city;
   this.formatted_query = geoData[0].display_name;
@@ -155,6 +166,12 @@ function Trails(trail) {
   this.conditions = trail.conditionStatus;
   this.condition_date = new Date(trail.conditionDate).toDateString();
 }
+
+// Cache for Location
+
+// Cache for weather
+
+// cache for trails
 
 // Make sure the server is listening for requests
 app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
