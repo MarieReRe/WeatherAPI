@@ -44,8 +44,24 @@ app.get('/trails', getTrails);
 // app.get('/movies', );
 // app.get('/yelp', );
 
-
-
+// function is storing this into the locations table
+function setLocationInCache(location){
+  const { search_query, formatted_query, latitude, longitude} = location;
+  const SQL = `
+  INSERT INTO Locations (search_query, formatted_query, latitude, longitude)
+  VALUES ($1, $2, $3, $4)
+  RETURNING *
+  `;
+  const parameters = [search_query, formatted_query, latitude, longitude];
+  client.query(SQL,parameters)
+  .then(result => {
+    console.log('Cache Location', result);
+  })
+  .catch(err => {
+    console.error('Failed to cache location', err);
+  })
+  client.query(SQL)
+}
 // Route Handler: location
 function locationHandler(request, response) {
   const city = request.query.city;
