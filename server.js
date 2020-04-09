@@ -27,6 +27,10 @@ app.get('/bad', (request, response) => {
 
 // Add /location route
 app.get('/location', locationHandler);
+app.get('/weather', weatherHandler);
+app.get('/trails', getTrails);
+// app.get('/movies', );
+// app.get('/yelp', );
 
 
 
@@ -52,8 +56,6 @@ function locationHandler(request, response) {
     });
   }
 
-// Add /weather route
-app.get('/weather', weatherHandler);
   // Route Handler: weather
   function weatherHandler(request, response) {
     const url = 'https://api.weatherbit.io/v2.0/forecast/daily'
@@ -77,6 +79,30 @@ app.get('/weather', weatherHandler);
       errorHandler(err, request, response);
     });
   }
+
+
+  //Trails Handler
+  function getTrails(request, response) {
+    const url = 'https://www.hikingproject.com/data/get-trails';
+    superagent.get(url)
+      .query({
+        key: process.env.TRAIL_KEY,
+        lat: request.query.latitude,
+        lon: request.query.longitude,
+        format:'json'
+      })
+      .then( trailsResponse => {
+        let trailsData = trailsResponse.body;
+        let trailsResults = trailsData.trails.map( trails => {
+          return new Trails(trails);
+        })
+        response.send(trailsResults);
+      })
+      .catch(error => {
+        console.log(error);
+        errorHandler(error, request, response);
+      })
+  }
   
 
   // Has to happen after everything else
@@ -84,12 +110,11 @@ app.get('/weather', weatherHandler);
   // Has to happen after the error might have occurred
   app.use(errorHandler); // Error Middleware
 
-  // Make sure the server is listening for requests
-  app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
+  
 
   // Helper Functions
 
-  function errorHandler(error, request, response, next) {
+  function errorHandler(error, response) {
     console.log(error);
     response.status(500).json({
       error: true,
@@ -113,5 +138,22 @@ app.get('/weather', weatherHandler);
   // Weather
   function Weather(weatherData) {
     this.forecast = weatherData.weather.description;
-    this.time = new Date(weatherData.ts);
+    this.time = new Date(weatherData.ts * 1000);
   }
+
+  
+// trails constructor
+function Trails(trail){
+  this.name = trail.name;
+  this.location = trail.location;
+  this.length = trail.length;
+  this.stars = trail.stars;
+  this.star_votes = trail.starVotes;
+  this.summary = trail.summary;
+  this.trail_url = trail.url;
+  this.conditions = trail.conditionStatus;
+  this.condition_date = new Date(trailsData.conditionDate).toDateString();
+}
+
+  // Make sure the server is listening for requests
+  app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
