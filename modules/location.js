@@ -27,7 +27,7 @@ function setLocationInCache(location) {
   return client.query(SQL, parameters)
     .then(result => {
       console.log('Cache Location', result);
-    })
+    })                                                   
     .catch(err => {
       console.error('Failed to cache location', err);
     })
