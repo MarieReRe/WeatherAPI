@@ -16,7 +16,7 @@ if (!process.env.DATABASE_URL) {
 }
 const client = new pg.Client(process.env.DATABASE_URL);
 client.on('error', error => { throw error; });
-
+console.log('PG is connected');
 
 // Application Setup
 const PORT = process.env.PORT || 3000;
@@ -64,20 +64,18 @@ function setLocationInCache(location) {
   RETURNING *
   `;
   const parameters = [search_query, formatted_query, latitude, longitude];
-  client.query(SQL, parameters)
+  return client.query(SQL, parameters)
     .then(result => {
       console.log('Cache Location', result);
     })
     .catch(err => {
       console.error('Failed to cache location', err);
     })
-  client.query(SQL)
+  // client.query(SQL)
 }
 // Route Handler: location
 function locationHandler(request, response) {
   const city = request.query.city;
-
-
   //returning promise
   getLocationFromCache(city)
     .then(result => {
@@ -93,7 +91,7 @@ function locationHandler(request, response) {
 
 function getLocationFromApi(city, response) {
   const url = 'https://us1.locationiq.com/v1/search.php';
-  superagent.get(url)
+  return superagent.get(url)
     .query({
       key: process.env.GEO_KEY,
       q: city, // query
@@ -106,7 +104,7 @@ function getLocationFromApi(city, response) {
 
       setLocationInCache(location)
         .then(() => {
-          response.send(location);
+          return response.send(location);
         });
     })
     .catch(err => {
@@ -114,6 +112,21 @@ function getLocationFromApi(city, response) {
       errorHandler(err, request, response);
     });
 }
+
+// Location constructor 
+function Location(city, geoData) {
+  this.search_query = city;
+  this.formatted_query = geoData[0].display_name;
+  this.latitude = parseFloat(geoData[0].lat);
+  this.longitude = parseFloat(geoData[0].lon);
+}
+
+
+
+
+
+
+
 
 
 
@@ -188,13 +201,16 @@ function notFoundHandler(request, response) {
     notFound: true,
   });
 }
-// Location constructor 
-function Location(city, geoData) {
-  this.search_query = city;
-  this.formatted_query = geoData[0].display_name;
-  this.latitude = parseFloat(geoData[0].lat);
-  this.longitude = parseFloat(geoData[0].lon);
-}
+
+//Client connect
+client.connect()
+  .then(() => {
+    console.log('Database connected.');
+    app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+  })
+  .catch(error => {
+    throw `Something went wrong: ${error}`;
+  });
 
 // Weather
 function Weather(weatherData) {
@@ -215,12 +231,3 @@ function Trails(trail) {
   this.conditions = trail.conditionStatus;
   this.condition_date = new Date(trail.conditionDate).toDateString();
 }
-
-// Cache for Location
-
-// Cache for weather
-
-// cache for trails
-
-// Make sure the server is listening for requests
-app.listen(PORT, () => console.log(`App is listening on ${PORT}`));
