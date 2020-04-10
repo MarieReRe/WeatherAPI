@@ -85,7 +85,6 @@ function locationHandler(request, response) {
       } else {
         return getLocationFromApi(city, response);
       }
-
     })
 }
 
