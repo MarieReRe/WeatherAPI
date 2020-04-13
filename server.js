@@ -4,9 +4,9 @@
 const dotenv = require('dotenv')
 dotenv.config();
 
+
 // Application Setup
 const PORT = process.env.PORT || 3000;
-
 
 // Application Dependencies
 const express = require('express');
@@ -20,7 +20,7 @@ const getTrails = require('./modules/trails');
 const yelpHandler = require('./modules/yelp')
 const client = require('./util/database');
 const errorHandler = require('./util/error');
-
+console.log(client);
 // Middleware
 app.use(cors()); 
 
@@ -29,13 +29,12 @@ app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
 app.get('/trails', getTrails);
 app.get('/movies', (request, response) => {
-  response.send([]);
+  response.json([]);
 } );
 app.get('/yelp', yelpHandler);
 app.get('/', (request, response) => {
   response.send('City Explorer Goes Here');
 });
-
 app.get('/bad', (request, response) => {
   throw new Error('oops');
 });

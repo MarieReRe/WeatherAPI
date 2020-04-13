@@ -2,7 +2,7 @@
 
 const superagent = require('superagent');
 // const client = require('../util/database');
-
+const errorHandler = require('../util/error');
 
 // Route Handler: weather
 function weatherHandler(request, response) {

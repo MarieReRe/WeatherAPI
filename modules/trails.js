@@ -1,6 +1,7 @@
 'use strict';
 
 const superagent = require('superagent');
+const errorHandler = require('../util/error');
 // const client = require('../util/database');
 
 

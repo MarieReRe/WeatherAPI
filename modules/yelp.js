@@ -1,6 +1,8 @@
 'use strict';
 
 const superagent = require('superagent');
+const errorHandler = require('../util/error');
+
 //Route Handler: Yelp
 function yelpHandler(request, response) {
     const url = 'https://api.yelp.com/v3/businesses/search';
