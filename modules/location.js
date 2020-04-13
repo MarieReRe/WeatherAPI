@@ -3,7 +3,7 @@
 
 const superagent = require('superagent');
 const client = require('../util/database');
-
+const errorHandler = require('../util/error');
 
 function getLocationFromCache(city) {
   const SQL = `

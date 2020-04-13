@@ -17,8 +17,9 @@ const app = express();
 const locationHandler = require('./modules/location');
 const weatherHandler = require('./modules/weather');
 const getTrails = require('./modules/trails');
+const yelpHandler = require('./modules/yelp')
 const client = require('./util/database');
-
+const errorHandler = require('./util/error');
 
 // Middleware
 app.use(cors()); 
@@ -30,7 +31,7 @@ app.get('/trails', getTrails);
 app.get('/movies', (request, response) => {
   response.send([]);
 } );
-// app.get('/yelp', yelpHandler );
+app.get('/yelp', yelpHandler);
 app.get('/', (request, response) => {
   response.send('City Explorer Goes Here');
 });
@@ -39,10 +40,6 @@ app.get('/bad', (request, response) => {
   throw new Error('oops');
 });
 
-
-
-
-
 // Has to happen after everything else
 app.use(notFoundHandler);
 // Has to happen after the error might have occurred
@@ -50,21 +47,13 @@ app.use(errorHandler); // Error Middleware
 
 
 
-// Helper Functions
-
-function errorHandler(error, response) {
-  console.log(error);
-  response.status(500).json({
-    error: true,
-    message: error.message,
-  });
-}
-
+//not found error
 function notFoundHandler(request, response) {
   response.status(404).json({
     notFound: true,
   });
 }
+
 
 //Client connect
 client.connect()

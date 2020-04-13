@@ -12,7 +12,7 @@ function weatherHandler(request, response) {
         key: process.env.WEATHER_KEY,
         lat: request.query.latitude,
         lon: request.query.longitude,
-        format: 'json'
+        format:'json'
       })
       .then(weatherresponse => {
         let weatherData = weatherresponse.body;
