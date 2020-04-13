@@ -4,9 +4,9 @@
 const dotenv = require('dotenv')
 dotenv.config();
 
+
 // Application Setup
 const PORT = process.env.PORT || 3000;
-
 
 // Application Dependencies
 const express = require('express');
@@ -17,9 +17,10 @@ const app = express();
 const locationHandler = require('./modules/location');
 const weatherHandler = require('./modules/weather');
 const getTrails = require('./modules/trails');
+const yelpHandler = require('./modules/yelp')
 const client = require('./util/database');
-
-
+const errorHandler = require('./util/error');
+console.log(client);
 // Middleware
 app.use(cors()); 
 
@@ -28,20 +29,15 @@ app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
 app.get('/trails', getTrails);
 app.get('/movies', (request, response) => {
-  response.send([]);
+  response.json([]);
 } );
-// app.get('/yelp', yelpHandler );
+app.get('/yelp', yelpHandler);
 app.get('/', (request, response) => {
   response.send('City Explorer Goes Here');
 });
-
 app.get('/bad', (request, response) => {
   throw new Error('oops');
 });
-
-
-
-
 
 // Has to happen after everything else
 app.use(notFoundHandler);
@@ -50,21 +46,13 @@ app.use(errorHandler); // Error Middleware
 
 
 
-// Helper Functions
-
-function errorHandler(error, response) {
-  console.log(error);
-  response.status(500).json({
-    error: true,
-    message: error.message,
-  });
-}
-
+//not found error
 function notFoundHandler(request, response) {
   response.status(404).json({
     notFound: true,
   });
 }
+
 
 //Client connect
 client.connect()

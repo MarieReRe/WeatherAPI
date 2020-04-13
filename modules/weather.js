@@ -2,7 +2,7 @@
 
 const superagent = require('superagent');
 // const client = require('../util/database');
-
+const errorHandler = require('../util/error');
 
 // Route Handler: weather
 function weatherHandler(request, response) {
@@ -12,7 +12,7 @@ function weatherHandler(request, response) {
         key: process.env.WEATHER_KEY,
         lat: request.query.latitude,
         lon: request.query.longitude,
-        format: 'json'
+        format:'json'
       })
       .then(weatherresponse => {
         let weatherData = weatherresponse.body;
